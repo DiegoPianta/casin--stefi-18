@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Casino18 — Mini Casinò dei 18 anni</title>
+  <style>
+    :root{
+      --bg:#0b0f1a; --card:#0f1724; --accent:#ff4d6d; --neon:#35f0ff; --muted:#9aa4b2;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:#e6eef6;background:linear-gradient(180deg,var(--bg),#071224);min-height:100vh}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--neon),var(--accent));display:flex;align-items:center;justify-content:center;color:#04111b;font-weight:800;font-size:20px}
+    h1{margin:0;font-size:20px}
+    .controls{display:flex;gap:12px;align-items:center}
+    .credits{background:var(--glass);padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+    .main{padding:24px;display:grid;grid-template-columns:1fr 360px;gap:20px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .game{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;min-height:140px}
+    .game h3{margin:0}
+    .btn{padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--neon),var(--accent));color:#04111b;border:none;cursor:pointer;font-weight:700}
+    .muted{color:var(--muted)}
+    .sidebar{display:flex;flex-direction:column;gap:12px}
+    .memories-list{display:flex;flex-direction:column;gap:8px}
+    .memory{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;flex-direction:column}
+    /* modals */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.7);display:none;align-items:center;justify-content:center;padding:24px}
+    .modal{width:100%;max-width:760px;background:var(--card);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04)}
+    .row{display:flex;gap:12px;align-items:center}
+    /* slot */
+    .slot-board{display:flex;gap:10px;justify-content:center;padding:20px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px}
+    .reel{width:84px;height:84px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(180deg,#071429, #092136);color:#fff;border:2px solid rgba(255,255,255,0.03)}
+    .small{font-size:13px}
+    footer{padding:18px;text-align:center;color:var(--muted)}
+    @media(max-width:900px){.main{grid-template-columns:1fr}.sidebar{order:2}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">18</div>
+      <div>
+        <h1>Casino18</h1>
+        <div class="muted small">Mini-casinò & ricordi</div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="credits card" id="creditsCard">Crediti: <strong id="credits">0</strong></div>
+      <button class="btn" id="addCreditsBtn">+100 crediti</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section>
+      <div class="card">
+        <h2>Giochi</h2>
+        <p class="muted small">Scegli un gioco. Tutto è a crediti finti — divertiti!</p>
+        <div class="games" style="margin-top:12px">
+          <div class="game">
+            <h3>Slot Machine</h3>
+            <p class="muted small">Gira i rulli e vinci crediti</p>
+            <button class="btn" onclick="openModal('slotModal')">Gioca</button>
+          </div>
+
+          <div class="game">
+            <h3>Roulette</h3>
+            <p class="muted small">Scommetti su rosso/nero o un numero</p>
+            <button class="btn" onclick="openModal('rouletteModal')">Gioca</button>
+          </div>
+
+          <div class="game">
+            <h3>BlackJack</h3>
+            <p class="muted small">Contro un bot semplice</p>
+            <button class="btn" onclick="openModal('blackjackModal')">Gioca</button>
+          </div>
+
+          <div class="game">
+            <h3>Gratta & Vinci</h3>
+            <p class="muted small">Sgratta con il mouse/touch</p>
+            <button class="btn" onclick="openModal('scratchModal')">Gioca</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Livelli & Obiettivi</h2>
+        <p class="muted small">Ogni tot crediti sblocchi un ricordo.</p>
+        <ul class="muted small">
+          <li>200 crediti → Ricordo 1</li>
+          <li>400 crediti → Ricordo 2</li>
+          <li>800 crediti → Ricordo 3</li>
+        </ul>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="card">
+        <h3>I tuoi ricordi</h3>
+        <div class="memories-list" id="memoriesList">
+          <!-- ricordi caricati dinamicamente -->
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Info</h3>
+        <p class="muted small">Sito creato come regalo — tutto a scopo ludico. Salva su GitHub e pubblica su GitHub Pages.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="card" style="margin:18px">Made with ♥ for the 18th birthday</footer>
+
+  <!-- MODALI -->
+  <div class="modal-backdrop" id="slotModal">
+    <div class="modal">
+      <div class="row" style="justify-content:space-between"><h3>Slot Machine</h3><button onclick="closeModal('slotModal')" class="btn">Chiudi</button></div>
+      <p class="muted small">Costo: 10 crediti per spin — Vincita massima: 200 crediti</p>
+      <div class="slot-board" id="slotBoard">
+        <div class="reel" id="r1">🍕</div>
+        <div class="reel" id="r2">⚽</div>
+        <div class="reel" id="r3">🚗</div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:12px">
+        <button class="btn" onclick="spinSlot()">SPIN (10 crediti)</button>
+        <div class="muted small" id="slotMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="rouletteModal">
+    <div class="modal">
+      <div class="row" style="justify-content:space-between"><h3>Roulette (semplice)</h3><button onclick="closeModal('rouletteModal')" class="btn">Chiudi</button></div>
+      <p class="muted small">Scommetti rosso/nero (costo 10). Vincita: x2.</p>
+      <div style="margin-top:12px;display:flex;gap:10px">
+        <button class="btn" onclick="playRoulette('red')">Rosso</button>
+        <button class="btn" onclick="playRoulette('black')">Nero</button>
+      </div>
+      <div class="muted small" id="rouletteMsg" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="blackjackModal">
+    <div class="modal">
+      <div class="row" style="justify-content:space-between"><h3>BlackJack (semplificato)</h3><button onclick="closeModal('blackjackModal')" class="btn">Chiudi</button></div>
+      <p class="muted small">Versione ridotta: carta più alta vince. Costo 20 crediti.</p>
+      <div style="margin-top:12px;display:flex;gap:12px"><button class="btn" onclick="playBlackjack()">Gioca (20 crediti)</button></div>
+      <div class="muted small" id="bjMsg" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="scratchModal">
+    <div class="modal">
+      <div class="row" style="justify-content:space-between"><h3>Gratta & Vinci</h3><button onclick="closeModal('scratchModal')" class="btn">Chiudi</button></div>
+      <p class="muted small">Costo 5 crediti. Sgratta per rivelare 3 simboli.</p>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+        <button class="btn" onclick="playScratch()">Gratta (5 crediti)</button>
+      </div>
+      <div class="muted small" id="scratchMsg" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    // --- DATI INIZIALI (puoi spostare in data/memories.json nella repo) ---
+    const MEMORIES = [
+      {level:200, title:"Ricordo 1", text:"La prima serata fuori insieme: pizza e risate" , img: null},
+      {level:400, title:"Ricordo 2", text:"Il viaggio che non dimenticheremo" , img: null},
+      {level:800, title:"Ricordo 3", text:"Il giorno in cui hai vinto la partita!" , img: null}
+    ];
+
+    // --- stato usando localStorage ---
+    function loadState(){
+      const credits = parseInt(localStorage.getItem('credits')) || 300;
+      const unlocked = JSON.parse(localStorage.getItem('unlockedMemories')||'[]');
+      return {credits, unlocked};
+    }
+    function saveState(state){
+      localStorage.setItem('credits', state.credits);
+      localStorage.setItem('unlockedMemories', JSON.stringify(state.unlocked));
+    }
+
+    let state = loadState();
+    const creditsEl = document.getElementById('credits');
+    const memoriesList = document.getElementById('memoriesList');
+
+    function render(){
+      creditsEl.textContent = state.credits;
+      // render memories (locked/unlocked)
+      memoriesList.innerHTML = '';
+      MEMORIES.forEach(m=>{
+        const unlocked = state.unlocked.includes(m.level);
+        const div = document.createElement('div'); div.className='memory';
+        div.innerHTML = `<strong>${m.title}</strong><div class='muted small'>${unlocked?m.text:`Sblocca a ${m.level} crediti`}</div>`;
+        memoriesList.appendChild(div);
+      })
+    }
+
+    render();
+
+    // --- utility modali ---
+    function openModal(id){
+      document.getElementById(id).style.display='flex';
+    }
+    function closeModal(id){
+      document.getElementById(id).style.display='none';
+      // pulisci messaggi
+      ['slotMsg','rouletteMsg','bjMsg','scratchMsg'].forEach(i=>{const el=document.getElementById(i); if(el) el.textContent='';})
+    }
+
+    document.getElementById('addCreditsBtn').addEventListener('click',()=>{
+      state.credits += 100; checkUnlocks(); saveState(state); render();
+    })
+
+    function checkUnlocks(){
+      MEMORIES.forEach(m=>{
+        if(state.credits >= m.level && !state.unlocked.includes(m.level)){
+          state.unlocked.push(m.level);
+          // show popup — semplice alert per ora
+          alert(`Hai sbloccato: ${m.title}\n\n${m.text}`);
+        }
+      })
+      saveState(state);
+    }
+
+    // --- SLOT MACHINE ---
+    const SYMBOLS = ['🍕','⚽','🚗','🎮','🎉','😎','🍺'];
+    function spinSlot(){
+      if(state.credits < 10){document.getElementById('slotMsg').textContent='Crediti insufficienti'; return}
+      state.credits -= 10; saveState(state); render();
+      const r1 = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+      const r2 = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+      const r3 = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+      // animazione semplice
+      const ids=['r1','r2','r3'];
+      ids.forEach((id,i)=>{
+        setTimeout(()=>{document.getElementById(id).textContent = [r1,r2,r3][i];}, i*180);
+      })
+      setTimeout(()=>{
+        let reward = 0;
+        if(r1===r2 && r2===r3){ reward = 200; document.getElementById('slotMsg').textContent='Jackpot! +200'; }
+        else if(r1===r2 || r2===r3 || r1===r3){ reward = 40; document.getElementById('slotMsg').textContent='Buona! +40'; }
+        else { document.getElementById('slotMsg').textContent='Niente, riprova!'; }
+        state.credits += reward; saveState(state); checkUnlocks(); render();
+      }, 700);
+    }
+
+    // --- ROULETTE (semplice) ---
+    function playRoulette(choice){
+      if(state.credits < 10){document.getElementById('rouletteMsg').textContent='Crediti insufficienti'; return}
+      state.credits -= 10; saveState(state); render();
+      const spin = Math.random() < 0.5 ? 'red' : 'black';
+      if(spin === choice){ state.credits += 20; document.getElementById('rouletteMsg').textContent=`Hai vinto! Era ${spin} (+20)`; }
+      else { document.getElementById('rouletteMsg').textContent=`Hai perso. Era ${spin}`; }
+      saveState(state); checkUnlocks(); render();
+    }
+
+    // --- BLACKJACK semplificato ---
+    function playBlackjack(){
+      if(state.credits < 20){document.getElementById('bjMsg').textContent='Crediti insufficienti'; return}
+      state.credits -= 20; saveState(state); render();
+      const player = Math.floor(Math.random()*13)+1; const bot = Math.floor(Math.random()*13)+1;
+      if(player > bot){ state.credits += 40; document.getElementById('bjMsg').textContent=`Hai vinto! ${player} vs ${bot} (+40)`; }
+      else if(player === bot){ state.credits += 20; document.getElementById('bjMsg').textContent=`Parità (${player} vs ${bot}) (+20)`; }
+      else { document.getElementById('bjMsg').textContent=`Hai perso (${player} vs ${bot})`; }
+      saveState(state); checkUnlocks(); render();
+    }
+
+    // --- SCRATCH CARD ---
+    function playScratch(){
+      if(state.credits < 5){document.getElementById('scratchMsg').textContent='Crediti insufficienti'; return}
+      state.credits -= 5; saveState(state); render();
+      const pool = [0,0,10,20,50,100];
+      const picks = Array.from({length:3},()=>pool[Math.floor(Math.random()*pool.length)]);
+      const total = picks.reduce((a,b)=>a+b,0);
+      state.credits += total; document.getElementById('scratchMsg').textContent=`Hai trovato: ${picks.join(', ')} → +${total}`;
+      saveState(state); checkUnlocks(); render();
+    }
+
+    // init check unlocks on first load
+    checkUnlocks();
+  </script>
+</body>
+</html>
